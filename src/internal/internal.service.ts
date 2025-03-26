@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AgentService } from '~/agent/agent.service';
+import { ChannelService } from '~/channel/channel.service';
 import { ConnectAppService } from '~/connect-app/connect-app.service';
 import { CustomFieldService } from '~/custom-field/custom-field.service';
-import { MONGO_CONNECTION } from '~/mongo/connections';
 import { RoleService } from '~/role/role.service';
 import { PopulateDefaultDto } from './dto/populate-default.dto';
 
@@ -12,7 +12,8 @@ export class InternalService {
     private readonly roleService: RoleService,
     private readonly connectAppService: ConnectAppService,
     private readonly agentService: AgentService,
-    private readonly customFieldService: CustomFieldService
+    private readonly customFieldService: CustomFieldService,
+    private readonly channelService: ChannelService
   ) {}
 
   async populateDefault({
@@ -33,6 +34,7 @@ export class InternalService {
     const [roleId] = await Promise.all([
       this.roleService.createDefault(appId.toString(), userId),
       this.customFieldService.createDefault(appId.toString()),
+      this.channelService.createDefault(appId.toString()),
     ]);
 
     const createdAgents = await this.agentService.createAgents({

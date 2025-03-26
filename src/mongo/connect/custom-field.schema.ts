@@ -54,6 +54,7 @@ const CustomFieldSchema = new Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 );
 
