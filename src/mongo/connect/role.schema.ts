@@ -66,10 +66,7 @@ RoleSchema.path('permissions').transform(function (value: Permission) {
 });
 
 const RoleSchemaName = 'role';
-export const RoleModel = MONGO_CONNECTION.DEFAULT.model(
-  RoleSchemaName,
-  RoleSchema
-);
+const RoleModel = MONGO_CONNECTION.DEFAULT.model(RoleSchemaName, RoleSchema);
 
 export const RoleModelProvider = {
   provide: RoleSchemaName,

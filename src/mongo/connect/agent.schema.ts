@@ -53,10 +53,7 @@ AgentSchema.index({ appId: 1, userId: 1 }, { unique: true });
 
 const AgentSchemaName = 'agent';
 
-export const AgentModel = MONGO_CONNECTION.DEFAULT.model(
-  AgentSchemaName,
-  AgentSchema
-);
+const AgentModel = MONGO_CONNECTION.DEFAULT.model(AgentSchemaName, AgentSchema);
 
 export const AgentModelProvider = {
   provide: AgentSchemaName,
@@ -65,11 +62,11 @@ export const AgentModelProvider = {
 
 export type Agent = InferSchemaType<typeof AgentSchema>;
 
-export interface AgentDetails extends Agent {
+export type AgentDetails = Agent & {
   emailId?: string;
   mobileNo?: string;
   countryCode?: string;
   role?: Role | null;
   teamIds?: string[];
   name: string;
-}
+};
