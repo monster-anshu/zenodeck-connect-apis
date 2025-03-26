@@ -15,11 +15,24 @@ export class CustomFieldController {
     @GetSession('userId') userId: string,
     @Body() body: CreateCustomFieldDto
   ) {
-    const customField = this.customFieldService.create(appId, userId, body);
+    const customField = await this.customFieldService.create(
+      appId,
+      userId,
+      body
+    );
 
     return {
       isSuccess: true,
       customField,
+    };
+  }
+
+  async list(@GetSession('appId') appId: string) {
+    const customFields = await this.customFieldService.list(appId);
+
+    return {
+      isSuccess: true,
+      customFields,
     };
   }
 }

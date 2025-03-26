@@ -58,4 +58,14 @@ export class CustomFieldService {
 
     return createdField;
   }
+
+  async list(appId: string) {
+    const customFields = await this.customFieldModel
+      .find({
+        appId,
+      })
+      .lean();
+
+    return customFields;
+  }
 }
