@@ -1,3 +1,4 @@
+import fastifyCookie from '@fastify/cookie';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -7,12 +8,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger, ZodValidationPipe } from 'nestjs-zod';
 import { AppModule } from '~/app.module';
 import { PORT } from '~/env';
+import { onHeader, SessionMiddlewareFn } from '~/session/session.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ logger: true })
   );
+
+  await app.register(fastifyCookie);
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addHook('onRequest', SessionMiddlewareFn)
+    .addHook('onSend', onHeader);
 
   app.setGlobalPrefix('/api/v1/connect');
   app.useGlobalPipes(new ZodValidationPipe());
