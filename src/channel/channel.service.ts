@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { decrypt, encrypt } from '~/lib/crypto';
 import { randomString } from '~/lib/random';
 import { ChannelModelProvider } from '~/mongo/connect/channel.schema';
@@ -67,5 +67,29 @@ export class ChannelService {
     });
 
     return channels;
+  }
+
+  async getByClientId(clientId: string) {
+    const channel = await this.channelModel
+      .findOne(
+        {
+          clientId: encrypt(clientId),
+          status: 'ACTIVE',
+        },
+        {
+          _id: 0,
+          allowedDomains: 1,
+          appId: 1,
+          customization: 1,
+          enablePreview: 1,
+        }
+      )
+      .lean();
+
+    if (!channel) {
+      throw new NotFoundException('CHANNEL_NOT_FOUND');
+    }
+
+    return channel;
   }
 }
