@@ -9,5 +9,6 @@ import { AgentService } from './agent.service';
   controllers: [AgentController],
   providers: [AgentService, AgentModelProvider],
   imports: [RoleModule],
+  exports: [AgentService],
 })
 export class AgentModule {}
