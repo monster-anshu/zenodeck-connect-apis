@@ -1,10 +1,32 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { encrypt } from '~/lib/crypto';
+import { decrypt, encrypt } from '~/lib/crypto';
 import { randomString } from '~/lib/random';
 import { ChannelModelProvider } from '~/mongo/connect/channel.schema';
 
 @Injectable()
 export class ChannelService {
+  static readonly DEFAULT_PROJECTION = {
+    allowedDomains: 1,
+    clientId: 1,
+    createdAt: 1,
+    createdBy: 1,
+    customization: 1,
+    defaultBotId: 1,
+    defaultTeamId: 1,
+    description: 1,
+    enableFeedback: 1,
+    enablePreview: 1,
+    isConnected: 1,
+    isDefault: 1,
+    modifiedBy: 1,
+    name: 1,
+    socialConfig: 1,
+    triggerBot: 1,
+    type: 1,
+    updatedAt: 1,
+    welcomeMessage: 1,
+  };
+
   constructor(
     @Inject(ChannelModelProvider.provide)
     private channelModel: typeof ChannelModelProvider.useValue
@@ -27,5 +49,23 @@ export class ChannelService {
     });
 
     return channel.toObject();
+  }
+
+  async list(appId: string) {
+    const channels = await this.channelModel
+      .find(
+        {
+          appId: appId,
+          status: ['ACTIVE', 'INACTIVE'],
+        },
+        ChannelService.DEFAULT_PROJECTION
+      )
+      .lean();
+
+    channels.forEach((channel) => {
+      channel.clientId = decrypt(channel.clientId);
+    });
+
+    return channels;
   }
 }
