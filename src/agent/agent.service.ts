@@ -6,7 +6,7 @@ import {
   AgentDetails,
   AgentModelProvider,
 } from '~/mongo/connect/agent.schema';
-// import { RoleService } from '~/role/role.service';
+import { RoleService } from '~/role/role.service';
 
 @Injectable()
 export class AgentService {
@@ -28,7 +28,7 @@ export class AgentService {
   };
 
   constructor(
-    // private readonly roleService: RoleService,
+    private readonly roleService: RoleService,
     @Inject(AgentModelProvider.provide)
     private agentModel: typeof AgentModelProvider.useValue
   ) {}
@@ -112,11 +112,10 @@ export class AgentService {
       decrypted,
     });
 
-    return userDet;
-    // const role = fetchRole
-    //   ? await this.roleService.getById(appId, agentInfo.roleId.toString())
-    //   : null;
-    // return { ...userDet, role };
+    const role = fetchRole
+      ? await this.roleService.getById(appId, agentInfo.roleId.toString())
+      : null;
+    return { ...userDet, role: role };
   }
 
   private format({

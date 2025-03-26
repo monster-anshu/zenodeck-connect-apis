@@ -1,5 +1,6 @@
 import { InferSchemaType, Schema } from 'mongoose';
 import { MONGO_CONNECTION } from '../connections';
+import { Role } from './role.schema';
 
 const AGENT_STATUS = ['INVITED', 'ACTIVE', 'DELETED'] as const;
 
@@ -68,7 +69,7 @@ export interface AgentDetails extends Agent {
   emailId?: string;
   mobileNo?: string;
   countryCode?: string;
-  // role?: Role | null;
+  role?: Role | null;
   teamIds?: string[];
   name: string;
 }
