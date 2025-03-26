@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AgentGuard } from '~/agent/agent.guard';
 import { GetSession } from '~/session/session.decorator';
 import { CustomFieldService } from './custom-field.service';
@@ -27,6 +27,7 @@ export class CustomFieldController {
     };
   }
 
+  @Get()
   async list(@GetSession('appId') appId: string) {
     const customFields = await this.customFieldService.list(appId);
 
