@@ -16,6 +16,7 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
 
     "baseUrl": "./",
     "paths": {

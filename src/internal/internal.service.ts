@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AgentService } from '~/agent/agent.service';
 import { ConnectAppService } from '~/connect-app/connect-app.service';
+import { CustomFieldService } from '~/custom-field/custom-field.service';
 import { RoleService } from '~/role/role.service';
 import { PopulateDefaultDto } from './dto/populate-default.dto';
 
@@ -9,7 +10,8 @@ export class InternalService {
   constructor(
     private readonly roleService: RoleService,
     private readonly connectAppService: ConnectAppService,
-    private readonly agentService: AgentService
+    private readonly agentService: AgentService,
+    private readonly customFieldService: CustomFieldService
   ) {}
 
   async populateDefault({
@@ -29,6 +31,7 @@ export class InternalService {
 
     const [roleId] = await Promise.all([
       this.roleService.createDefault(appId.toString(), userId),
+      this.customFieldService.createDefault(appId.toString()),
     ]);
 
     const createdAgents = await this.agentService.createAgents({
