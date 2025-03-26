@@ -1,4 +1,5 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import mongoose from 'mongoose';
 import { CustomFieldModelProvider } from '~/mongo/connect/custom-field.schema';
 import { predefinedFields } from './custom-field';
 import { CreateCustomFieldDto } from './dto/custom-field-create.dto';
@@ -47,17 +48,14 @@ export class CustomFieldService {
   }
 
   async createDefault(appId: string) {
-    const fields = [];
-    for (let index = 0; index < predefinedFields.length; index++) {
-      const cur = predefinedFields[index];
-      const field = {
-        ...cur,
-        sequence: index + 1,
-        appId,
-      };
-      const createdField = await this.customFieldModel.create(field);
-      fields.push(createdField);
-    }
-    return fields;
+    const fields = predefinedFields.map((item, index) => ({
+      ...item,
+      sequence: index + 1,
+      appId,
+    }));
+
+    const createdField = await this.customFieldModel.create(fields);
+
+    return createdField;
   }
 }

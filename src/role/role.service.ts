@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { Role, RoleModelProvider } from '~/mongo/connect/role.schema';
 
 @Injectable()
@@ -43,13 +43,8 @@ export class RoleService {
       //     modifiedBy: ObjectId(userId),
       //   },
     ];
-    let superAdminRole;
-    for (const role of roles) {
-      const document = await this.roleModel.create(role);
-      if (document.isSuperAdminRole) {
-        superAdminRole = document;
-      }
-    }
+    const documents = await this.roleModel.create(roles);
+    const superAdminRole = documents.find((item) => item.isSuperAdminRole);
     return superAdminRole!._id.toString();
   }
 

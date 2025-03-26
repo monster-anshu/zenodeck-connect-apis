@@ -7,6 +7,7 @@ mongoose.set('debug', !isProd);
 mongoose.set('runValidators', true);
 mongoose.set('strict', true);
 mongoose.set('autoIndex', !isProd);
+mongoose.set('transactionAsyncLocalStorage', true);
 
 const connectionsCache: Record<string, Connection> = {};
 

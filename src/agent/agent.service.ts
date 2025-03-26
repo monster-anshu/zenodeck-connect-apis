@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import mongoose from 'mongoose';
 import UserModel from '~/mongo/common/schema/User';
 import { User } from '~/mongo/common/types';
 import {

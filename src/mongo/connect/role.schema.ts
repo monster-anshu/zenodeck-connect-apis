@@ -31,21 +31,33 @@ const PermissionSchema = new Schema<Permission>(
 
 const RoleSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
     appId: {
-      type: Schema.Types.ObjectId,
-      required: true,
       index: true,
+      required: true,
+      type: Schema.Types.ObjectId,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+    },
+    isAutoCreated: {
+      default: false,
+      type: Boolean,
+    },
+    isSuperAdminRole: {
+      type: Boolean,
+    },
+    modifiedBy: {
+      type: Schema.Types.ObjectId,
+    },
+    name: {
+      required: true,
+      type: String,
     },
     permissions: PermissionSchema,
-    isSuperAdminRole: { type: Boolean },
-    status: { type: String, enum: Status },
-    isAutoCreated: { type: Boolean, default: false },
-    createdBy: { type: Schema.Types.ObjectId, required: true },
-    modifiedBy: { type: Schema.Types.ObjectId, required: true },
+    status: {
+      enum: Status,
+      type: String,
+    },
   },
   {
     timestamps: true,
