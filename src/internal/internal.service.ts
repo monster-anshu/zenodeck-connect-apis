@@ -30,26 +30,19 @@ export class InternalService {
       return null;
     }
 
-    const agent = await MONGO_CONNECTION.DEFAULT.transaction(async () => {
-      // not using Promise.all due to transaction does not support it
-      const roleId = await this.roleService.createDefault(
-        appId.toString(),
-        userId
-      );
+    const [roleId] = await Promise.all([
+      this.roleService.createDefault(appId.toString(), userId),
+      this.customFieldService.createDefault(appId.toString()),
+    ]);
 
-      await this.customFieldService.createDefault(appId.toString());
-
-      const createdAgents = await this.agentService.createAgents({
-        appId: appId.toString(),
-        userIds: [userId],
-        roleId: roleId.toString(),
-      });
-
-      const agent = createdAgents[0];
-
-      return agent || null;
+    const createdAgents = await this.agentService.createAgents({
+      appId: appId.toString(),
+      userIds: [userId],
+      roleId: roleId.toString(),
     });
 
-    return agent;
+    const agent = createdAgents[0];
+
+    return agent || null;
   }
 }
