@@ -58,7 +58,18 @@ export class ChannelService {
           appId: appId,
           status: ['ACTIVE', 'INACTIVE'],
         },
-        ChannelService.DEFAULT_PROJECTION
+        {
+          clientId: 1,
+          createdAt: 1,
+          createdBy: 1,
+          description: 1,
+          isConnected: 1,
+          isDefault: 1,
+          modifiedBy: 1,
+          name: 1,
+          type: 1,
+          updatedAt: 1,
+        }
       )
       .lean();
 
@@ -67,6 +78,27 @@ export class ChannelService {
     });
 
     return channels;
+  }
+
+  async getById(appId: string, id: string) {
+    const channel = await this.channelModel
+      .findOne(
+        {
+          _id: id,
+          appId: appId,
+          status: 'ACTIVE',
+        },
+        ChannelService.DEFAULT_PROJECTION
+      )
+      .lean();
+
+    if (!channel) {
+      throw new NotFoundException('CHANNEL_NOT_FOUND');
+    }
+
+    channel.clientId = decrypt(channel.clientId);
+
+    return channel;
   }
 
   async getByClientId(clientId: string) {

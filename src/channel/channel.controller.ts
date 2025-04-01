@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 import { AgentGuard } from '~/agent/agent.guard';
 import { GetSession } from '~/session/session.decorator';
 import { ChannelService } from './channel.service';
@@ -14,6 +14,15 @@ export class ChannelController {
     return {
       isSuccess: true,
       channels,
+    };
+  }
+
+  @Get(':id')
+  async get(@GetSession('appId') appId: string, @Param('id') id: string) {
+    const channel = await this.channelService.getById(appId, id);
+    return {
+      isSuccess: true,
+      channel,
     };
   }
 }
