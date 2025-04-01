@@ -56,7 +56,7 @@ const CustomerModel = MONGO_CONNECTION.DEFAULT.model(
   CustomerSchema
 );
 
-export const CustomerSchemaProvider = {
+export const CustomerModelProvider = {
   provide: CustomerSchemaName,
   useValue: CustomerModel,
 };

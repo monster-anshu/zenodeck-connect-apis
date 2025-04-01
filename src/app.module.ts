@@ -7,6 +7,7 @@ import { CustomFieldModule } from './custom-field/custom-field.module';
 import { InternalModule } from './internal/internal.module';
 import { RoleModule } from './role/role.module';
 import { WebsiteModule } from './website/website.module';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { WebsiteModule } from './website/website.module';
     CustomFieldModule,
     ChannelModule,
     WebsiteModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [],
