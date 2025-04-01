@@ -43,4 +43,4 @@ const shutdown = async () => {
   await MONGO_CONNECTION.COMMON.close();
   console.log('Mongoose connections closed');
 };
-process.on('SIGTERM', shutdown);
+// process.on('SIGTERM', shutdown);

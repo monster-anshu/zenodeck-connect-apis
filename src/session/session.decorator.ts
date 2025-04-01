@@ -34,7 +34,10 @@ export const GetSession = createParamDecorator(
     const request = ctx.switchToHttp().getRequest<FastifyRequest>();
 
     if (key === 'appId') {
-      return request.appInfo?._id?.toString();
+      return (
+        request.appInfo?._id?.toString() ||
+        request.customerSession?.connectApp?.appId
+      );
     }
     if (key === 'companyId') {
       return request.appInfo?.companyId?.toString();

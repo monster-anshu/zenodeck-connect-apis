@@ -17,14 +17,21 @@ export class WebsiteService {
     customerId?: string
   ) {
     const channel = await this.channelService.getByClientId(clientId, true);
-    const customer = await this.customerService.create(
-      channel.appId.toString(),
-      channel._id.toString(),
-      fields
-    );
+    const customer = customerId
+      ? await this.customerService.update(
+          channel.appId.toString(),
+          customerId,
+          fields
+        )
+      : await this.customerService.create(
+          channel.appId.toString(),
+          channel._id.toString(),
+          fields
+        );
 
     const token = signJwt({
       type: 'CUSTOMER',
+      customerId: customer._id.toString(),
       connectApp: {
         appId: customer.appId.toString(),
         channelId: customer.channelId.toString(),

@@ -46,6 +46,7 @@ const CustomerSchema = new Schema(
   {
     timestamps: true,
     autoIndex: false,
+    versionKey: false,
   }
 );
 
