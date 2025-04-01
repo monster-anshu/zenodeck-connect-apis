@@ -4,10 +4,10 @@ import { AppController } from './app.controller';
 import { ChannelModule } from './channel/channel.module';
 import { ConnectAppModule } from './connect-app/connect-app.module';
 import { CustomFieldModule } from './custom-field/custom-field.module';
+import { CustomerModule } from './customer/customer.module';
 import { InternalModule } from './internal/internal.module';
 import { RoleModule } from './role/role.module';
 import { WebsiteModule } from './website/website.module';
-import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [

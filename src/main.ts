@@ -8,7 +8,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger, ZodValidationPipe } from 'nestjs-zod';
 import { AppModule } from '~/app.module';
 import { PORT } from '~/env';
-import { onHeader, SessionMiddlewareFn } from '~/session/session.middleware';
+import { SessionMiddlewareFn } from '~/session/session.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -17,11 +17,8 @@ async function bootstrap() {
   );
 
   await app.register(fastifyCookie);
-  app
-    .getHttpAdapter()
-    .getInstance()
-    .addHook('onRequest', SessionMiddlewareFn)
-    .addHook('onSend', onHeader);
+  app.getHttpAdapter().getInstance().addHook('onRequest', SessionMiddlewareFn);
+  // .addHook('onSend', onHeader);
 
   app.setGlobalPrefix('/api/v1/connect');
   app.useGlobalPipes(new ZodValidationPipe());

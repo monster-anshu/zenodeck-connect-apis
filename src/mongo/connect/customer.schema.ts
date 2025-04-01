@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { InferSchemaType, Schema } from 'mongoose';
 import { MONGO_CONNECTION } from '../connections';
 
 const CUSTOMER_STATUS = ['ACTIVE', 'DELETED'] as const;
@@ -60,3 +60,5 @@ export const CustomerModelProvider = {
   provide: CustomerSchemaName,
   useValue: CustomerModel,
 };
+
+export type Customer = InferSchemaType<typeof CustomerSchema>;

@@ -174,4 +174,4 @@ export const ChannelModelProvider = {
   useValue: ChannelModel,
 };
 
-export type Channel = InferSchemaType<typeof ChannelModel>;
+export type Channel = InferSchemaType<typeof ChannelSchema>;

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ChannelModule } from '~/channel/channel.module';
+import { CustomerModule } from '~/customer/customer.module';
 import { WebsiteController } from './website.controller';
 import { WebsitePublicController } from './website.public.controller';
 import { WebsiteService } from './website.service';
@@ -7,6 +8,6 @@ import { WebsiteService } from './website.service';
 @Module({
   controllers: [WebsiteController, WebsitePublicController],
   providers: [WebsiteService],
-  imports: [ChannelModule],
+  imports: [ChannelModule, CustomerModule],
 })
 export class WebsiteModule {}

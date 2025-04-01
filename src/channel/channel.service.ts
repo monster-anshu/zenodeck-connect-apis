@@ -1,7 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ProjectionType } from 'mongoose';
 import { decrypt, encrypt } from '~/lib/crypto';
 import { randomString } from '~/lib/random';
-import { ChannelModelProvider } from '~/mongo/connect/channel.schema';
+import { Channel, ChannelModelProvider } from '~/mongo/connect/channel.schema';
 
 @Injectable()
 export class ChannelService {
@@ -101,21 +102,24 @@ export class ChannelService {
     return channel;
   }
 
-  async getByClientId(clientId: string) {
+  async getByClientId(clientId: string, fetchId = false) {
+    const projection: ProjectionType<Channel> = {
+      _id: 0,
+      allowedDomains: 1,
+      appId: 1,
+      customization: 1,
+      enablePreview: 1,
+    };
+
+    if (fetchId) {
+      delete projection['_id'];
+    }
+
     const channel = await this.channelModel
-      .findOne(
-        {
-          clientId: encrypt(clientId),
-          status: 'ACTIVE',
-        },
-        {
-          _id: 0,
-          allowedDomains: 1,
-          appId: 1,
-          customization: 1,
-          enablePreview: 1,
-        }
-      )
+      .findOne({
+        clientId: encrypt(clientId),
+        status: 'ACTIVE',
+      })
       .lean();
 
     if (!channel) {

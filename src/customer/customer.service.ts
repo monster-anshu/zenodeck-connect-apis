@@ -11,7 +11,7 @@ export class CustomerService {
   async create(
     appId: string,
     channelId: string,
-    fields: Record<string, string> & { emailId: string }
+    fields: Record<string, string> & { emailId?: string }
   ) {
     const customer = await this.customerModel.create({
       appId: appId,
@@ -20,6 +20,6 @@ export class CustomerService {
       fields,
     });
 
-    return customer;
+    return customer.toObject();
   }
 }

@@ -19,7 +19,7 @@ export class AgentGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const response = context.switchToHttp().getResponse();
     const request = context.switchToHttp().getRequest<FastifyRequest>();
-    const session = request.session;
+    const session = request.agentSession;
 
     if (!session) {
       throw new UnauthorizedException();
