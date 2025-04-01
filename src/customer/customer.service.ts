@@ -8,5 +8,18 @@ export class CustomerService {
     private readonly customerModel: typeof CustomerModelProvider.useValue
   ) {}
 
-  async create() {}
+  async create(
+    appId: string,
+    channelId: string,
+    fields: Record<string, string> & { emailId: string }
+  ) {
+    const customer = await this.customerModel.create({
+      appId: appId,
+      channelId: channelId,
+      source: 'WEB',
+      fields,
+    });
+
+    return customer;
+  }
 }
