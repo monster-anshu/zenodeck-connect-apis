@@ -1,6 +1,10 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { CustomFieldModelProvider } from '~/mongo/connect/custom-field.schema';
+import { z, ZodSchema } from 'zod';
+import {
+  CustomField,
+  CustomFieldModelProvider,
+} from '~/mongo/connect/custom-field.schema';
 import { predefinedFields } from './custom-field';
 import { CreateCustomFieldDto } from './dto/custom-field-create.dto';
 
@@ -59,7 +63,10 @@ export class CustomFieldService {
     return createdField;
   }
 
-  async list(appId: string) {
+  async list(
+    appId: string,
+    status: CustomField['status'][] = ['ACTIVE', 'INACTIVE']
+  ) {
     const customFields = await this.customFieldModel
       .find({
         appId,
@@ -68,4 +75,15 @@ export class CustomFieldService {
 
     return customFields;
   }
+
+  static validate(customField: CustomField, value: unknown) {
+    const schema = record[customField.type];
+    const result = schema.safeParse(value);
+    return result;
+  }
 }
+
+const record: Record<CustomField['type'], ZodSchema> = {
+  EMAIL: z.string().email(),
+  TEXT: z.string().nonempty(),
+};
