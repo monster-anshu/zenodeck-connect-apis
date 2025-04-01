@@ -18,7 +18,10 @@ export class WebsiteController {
 
     return {
       isSuccess: true,
-      customer,
+      customer: {
+        ...customer.fields,
+        _id: customer._id,
+      },
     };
   }
 }
