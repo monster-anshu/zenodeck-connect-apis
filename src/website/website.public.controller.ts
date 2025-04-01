@@ -32,8 +32,8 @@ export class WebsitePublicController {
   @Post('chat/initiate')
   async initiateCustomerChat(
     @Param('clientId') clientId: string,
-    @GetSession('customerId') customerId: string,
-    @Body() body: InitiateWebsiteChatDto
+    @Body() body: InitiateWebsiteChatDto,
+    @GetSession('customerId') customerId?: string
   ) {
     const { customer, token } = await this.websiteService.initiateChat(
       clientId,
@@ -44,6 +44,10 @@ export class WebsitePublicController {
     return {
       isSuccess: true,
       authToken: token,
+      customer: {
+        _id: customer._id,
+        ...customer.fields,
+      },
     };
   }
 }
