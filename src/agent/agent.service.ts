@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import UserModel from '~/mongo/common/schema/User';
 import { User } from '~/mongo/common/types';
 import {
@@ -117,6 +117,21 @@ export class AgentService {
       ? await this.roleService.getById(appId, agentInfo.roleId.toString())
       : null;
     return { ...userDet, role: role };
+  }
+
+  async getAssignee(appId: string, userId?: string) {
+    const filter: FilterQuery<Agent> = {
+      appId,
+      status: 'ACTIVE',
+    };
+
+    if (userId) {
+      filter.userId = userId;
+    }
+
+    const agent = await this.agentModel.findOne(filter).lean();
+
+    return agent;
   }
 
   private format({

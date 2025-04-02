@@ -35,7 +35,7 @@ export class WebsitePublicController {
     @Body() body: InitiateWebsiteChatDto,
     @GetSession('customerId') customerId?: string
   ) {
-    const { customer, token } = await this.websiteService.initiateChat(
+    const { customer, token, chat } = await this.websiteService.initiateChat(
       clientId,
       body,
       customerId
@@ -44,6 +44,7 @@ export class WebsitePublicController {
     return {
       isSuccess: true,
       authToken: token,
+      chat: chat,
       customer: {
         _id: customer._id,
         ...customer.fields,

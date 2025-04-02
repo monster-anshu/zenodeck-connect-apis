@@ -29,7 +29,7 @@ const ChatSchema = new Schema(
       required: true,
     },
     assignee: AssigneeSchema,
-    conversationStatus: {
+    status: {
       required: true,
       type: String,
       enum: CHAT_STATUS,

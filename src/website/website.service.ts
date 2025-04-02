@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { AgentService } from '~/agent/agent.service';
 import { ChannelService } from '~/channel/channel.service';
+import { ChatService } from '~/chat/chat.service';
 import { CustomerService } from '~/customer/customer.service';
 import signJwt from '~/lib/jwt/sign';
 import { InitiateWebsiteChatDto } from './dto/website-chat-initiate.dto';
@@ -8,7 +10,9 @@ import { InitiateWebsiteChatDto } from './dto/website-chat-initiate.dto';
 export class WebsiteService {
   constructor(
     private readonly channelService: ChannelService,
-    private readonly customerService: CustomerService
+    private readonly customerService: CustomerService,
+    private readonly agentService: AgentService,
+    private readonly chatService: ChatService
   ) {}
 
   async initiateChat(
@@ -29,6 +33,23 @@ export class WebsiteService {
           fields
         );
 
+    const agent = await this.agentService.getAssignee(channel.appId.toString());
+
+    const chat = await this.chatService.create(
+      channel.appId.toString(),
+      customer._id.toString(),
+      {
+        channelId: channel._id,
+        assignee: agent
+          ? {
+              type: 'AGENT',
+              assignedAt: new Date(),
+              userId: agent.userId,
+            }
+          : null,
+      }
+    );
+
     const token = signJwt({
       type: 'CUSTOMER',
       customerId: customer._id.toString(),
@@ -38,6 +59,6 @@ export class WebsiteService {
       },
     });
 
-    return { token, customer };
+    return { token, customer, chat };
   }
 }

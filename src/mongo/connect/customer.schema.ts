@@ -4,7 +4,7 @@ import { MONGO_CONNECTION } from '../connections';
 const CUSTOMER_STATUS = ['ACTIVE', 'DELETED'] as const;
 const CUSTOMER_ONLINE_STATUS = ['ONLINE', 'AWAY', 'OFFLINE'] as const;
 
-const FieldSchema = new Schema({} as Record<string, string>, {
+const FieldSchema = new Schema({} as Record<string, unknown>, {
   strict: false,
   _id: false,
 });

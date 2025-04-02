@@ -52,26 +52,58 @@ export class CustomerService {
     fields: Record<string, string> & { emailId?: string }
   ) {
     const customer = await this.customerModel
-      .findOneAndUpdate(
-        {
-          _id: customerId,
-          appId: appId,
-          status: 'ACTIVE',
-        },
-        {
-          $set: {
-            fields,
-          },
-        },
-        {
-          new: true,
-        }
-      )
+      .findOne({
+        appId: appId,
+        _id: customerId,
+        status: 'ACTIVE',
+      })
       .lean();
 
     if (!customer) {
       throw new NotFoundException('CUSTOMER_NOT_FOUND');
     }
+
+    if (!Object.keys(fields).length) {
+      return customer;
+    }
+
+    const customFields = await this.customFieldService.list(appId, ['ACTIVE']);
+
+    const fieldsToInsert: Record<string, unknown> = {};
+
+    customFields.forEach((customField) => {
+      const value = fields[customField.name];
+      const result = CustomFieldService.validate(customField, value);
+      if (!result.success) {
+        const issue = result.error.issues.at(0);
+        throw new UnprocessableEntityException(
+          `${customField.name}: ${issue?.message}`
+        );
+      }
+      fieldsToInsert[customField.name] = result.data;
+    });
+
+    if (!Object.keys(fieldsToInsert).length) {
+      return customer;
+    }
+
+    customer.fields = {
+      ...customer.fields,
+      ...(fieldsToInsert as typeof customer.fields),
+    };
+
+    await this.customerModel
+      .updateOne(
+        {
+          _id: customerId,
+        },
+        {
+          $set: {
+            fields: customer.fields,
+          },
+        }
+      )
+      .lean();
 
     return customer;
   }
