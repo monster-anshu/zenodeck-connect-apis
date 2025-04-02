@@ -8,6 +8,7 @@ import { CustomerModule } from './customer/customer.module';
 import { InternalModule } from './internal/internal.module';
 import { RoleModule } from './role/role.module';
 import { WebsiteModule } from './website/website.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { WebsiteModule } from './website/website.module';
     ChannelModule,
     WebsiteModule,
     CustomerModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [],
