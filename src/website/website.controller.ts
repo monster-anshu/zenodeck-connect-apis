@@ -19,6 +19,7 @@ export class WebsiteController {
     @GetSession('customerId') customerId: string
   ) {
     const customer = await this.customerService.getById(appId, customerId);
+    const chats = await this.chatService.list(appId, customerId);
 
     return {
       isSuccess: true,
@@ -26,6 +27,7 @@ export class WebsiteController {
         ...customer.fields,
         _id: customer._id,
       },
+      chats,
     };
   }
 

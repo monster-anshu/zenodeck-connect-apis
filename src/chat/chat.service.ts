@@ -13,12 +13,24 @@ export class ChatService {
     private readonly activityService: ActivityService
   ) {}
 
+  async list(appId: string, customerId: string) {
+    const chats = await this.chatModel
+      .find({
+        appId: appId,
+        customerId: customerId,
+        status: 'ACTIVE',
+      })
+      .lean();
+
+    return chats;
+  }
+
   async create(appId: string, customerId: string, data: Partial<Chat>) {
     const existingChat = await this.chatModel
       .findOne({
-        status: 'ACTIVE',
         appId: appId,
         customerId: customerId,
+        status: 'ACTIVE',
       })
       .lean();
 
@@ -64,6 +76,17 @@ export class ChatService {
       timestamp: new Date(),
       type: 'MESSAGE',
     });
+
+    await this.chatModel.updateOne(
+      {
+        _id: chat._id,
+      },
+      {
+        $inc: {
+          totalMsgCount: 1,
+        },
+      }
+    );
 
     return activity;
   }
