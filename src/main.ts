@@ -7,7 +7,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { patchNestJsSwagger, ZodValidationPipe } from 'nestjs-zod';
 import { AppModule } from '~/app.module';
-import { PORT } from '~/env';
+import { CONNECT_API_URL, NODE_ENV, PORT } from '~/env';
 import { SessionMiddlewareFn } from '~/session/session.middleware';
 
 async function bootstrap() {
@@ -26,8 +26,10 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Zenodeck Connect Apis')
     .setVersion('1.0')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+    .addServer(CONNECT_API_URL);
+
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, config.build());
   SwaggerModule.setup('docs', app, documentFactory, {
     useGlobalPrefix: true,
     jsonDocumentUrl: 'swagger.json',
