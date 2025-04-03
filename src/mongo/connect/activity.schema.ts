@@ -13,7 +13,7 @@ const ACTIVITY_DATA_TYPE = [
   'NOTES_REMOVED',
 ] as const;
 
-const MESSAGE_DATA_TYPE = ['TEXT'] as const;
+export const MESSAGE_DATA_TYPE = ['TEXT'] as const;
 
 const USRE_TYPE = ['CUSTOMER', 'AGENT'] as const;
 
