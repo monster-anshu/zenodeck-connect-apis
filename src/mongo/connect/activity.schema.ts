@@ -78,13 +78,22 @@ export const ActivityDataSchema = new Schema(
   }
 );
 
+const FormSchema = new Schema<From>(
+  {
+    customerId: Schema.Types.ObjectId,
+    type: {
+      enum: USRE_TYPE,
+      required: true,
+      type: String,
+    },
+    userId: Schema.Types.ObjectId,
+  },
+  { _id: false }
+);
+
 export const ActivitySchema = new Schema(
   {
     activityData: ActivityDataSchema,
-    timestamp: {
-      required: true,
-      type: Date,
-    },
     appId: {
       required: true,
       type: Schema.Types.ObjectId,
@@ -106,17 +115,16 @@ export const ActivitySchema = new Schema(
       type: String,
     },
     from: {
-      customerId: Schema.Types.ObjectId,
-      type: {
-        enum: USRE_TYPE,
-        required: true,
-        type: String,
-      },
-      userId: Schema.Types.ObjectId,
+      type: FormSchema,
+      required: true,
     },
     messageData: MessageDataSchema,
     replyContext: {
       messageId: Schema.Types.ObjectId,
+    },
+    timestamp: {
+      required: true,
+      type: Date,
     },
     type: {
       enum: ACTIVITY_TYPE,
@@ -141,4 +149,13 @@ export const ActivityModelProvider = {
   useValue: ActivityModel,
 };
 
-export type Message = InferSchemaType<typeof ActivitySchema>;
+export type Activity = InferSchemaType<typeof ActivitySchema>;
+export type From =
+  | {
+      type: 'CUSTOMER';
+      customerId: string;
+    }
+  | {
+      type: 'AGENT';
+      userId: string;
+    };
