@@ -38,6 +38,10 @@ export class ChatService {
     });
 
     pipelines.push({
+      $sort: { 'lastMessageInfo.activityTimestamp': -1 },
+    });
+
+    pipelines.push({
       $lookup: {
         from: AgentModelProvider.useValue.collection.name,
         as: 'agents',
