@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { FilterQuery, PipelineStage, Types } from 'mongoose';
 import { ActivityService } from '~/activity/activity.service';
-import { From } from '~/mongo/connect/activity.schema';
+import { ActivityModelProvider, From } from '~/mongo/connect/activity.schema';
 import { AgentModelProvider } from '~/mongo/connect/agent.schema';
 import { Chat, ChatModelProvider } from '~/mongo/connect/chat.schema';
 import { CustomerModelProvider } from '~/mongo/connect/customer.schema';
@@ -63,6 +63,33 @@ export class ChatService {
       },
     });
 
+    pipelines.push({
+      $lookup: {
+        from: ActivityModelProvider.useValue.collection.name,
+        as: 'acitivties',
+        localField: '_id',
+        foreignField: 'chatId',
+        pipeline: [
+          {
+            $sort: {
+              timestamp: -1,
+            },
+          },
+          {
+            $limit: 1,
+          },
+          {
+            $project: {
+              activityData: 1,
+              messageData: 1,
+              timestamp: 1,
+              type: 1,
+            },
+          },
+        ],
+      },
+    });
+
     const addFields: PipelineStage.AddFields['$addFields'] = {
       'assignee.name': {
         $first: '$agent.firstName',
@@ -72,6 +99,9 @@ export class ChatService {
       },
       // TODO: remove hard coded value
       'assignee.onlineStatus': 'ONLINE',
+      lastActivity: {
+        $first: '$acitivties',
+      },
     };
 
     if (fetchCustomerInfo) {
@@ -96,6 +126,7 @@ export class ChatService {
     }
 
     pipelines.push({ $addFields: addFields });
+    pipelines.push({ $unset: ['agent', 'acitivties'] });
 
     const chats = await this.chatModel.aggregate(pipelines);
 
