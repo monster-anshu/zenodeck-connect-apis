@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { ActivityService } from '~/activity/activity.service';
 import { From } from '~/mongo/connect/activity.schema';
 import { Chat, ChatModelProvider } from '~/mongo/connect/chat.schema';
@@ -46,27 +46,32 @@ export class ChatService {
     return chat.toObject();
   }
 
-  async message(
+  async createMessage(
     appId: string,
     channelId: string,
     chatId: string,
     from: From,
     body: SendMessageDto
   ) {
-    const chat = await this.chatModel
-      .findOne({
-        _id: chatId,
-        appId: appId,
-        status: 'ACTIVE',
-      })
-      .lean();
+    const filter: FilterQuery<Chat> = {
+      _id: chatId,
+      appId: appId,
+      channelId: channelId,
+      status: 'ACTIVE',
+    };
+
+    if (from.type === 'CUSTOMER') {
+      filter.customerId = from.customerId;
+    }
+
+    const chat = await this.chatModel.findOne(filter).lean();
 
     if (!chat) {
       throw new NotFoundException('CHAT_NOT_FOUND');
     }
 
     const activity = await this.activityService.create(appId, {
-      channelId: new Types.ObjectId(channelId),
+      channelId: chat.channelId,
       chatId: chat._id,
       from: from,
       messageData: {
@@ -89,5 +94,36 @@ export class ChatService {
     );
 
     return activity;
+  }
+
+  async listMessage(
+    appId: string,
+    channelId: string,
+    chatId: string,
+    customerId?: string
+  ) {
+    const filter: FilterQuery<Chat> = {
+      _id: chatId,
+      appId: appId,
+      channelId: channelId,
+      status: 'ACTIVE',
+    };
+
+    if (customerId) {
+      filter.customerId = customerId;
+    }
+
+    const chat = await this.chatModel.findOne(filter).lean();
+
+    if (!chat) {
+      throw new NotFoundException('CHAT_NOT_FOUND');
+    }
+
+    const activities = await this.activityService.list(
+      appId,
+      chat._id.toString()
+    );
+
+    return activities;
   }
 }

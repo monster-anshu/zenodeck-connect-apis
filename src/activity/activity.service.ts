@@ -26,4 +26,18 @@ export class ActivityService {
 
     return activity.toObject();
   }
+
+  async list(appId: string, chatId: string) {
+    const activities = await this.activityModel
+      .find({
+        appId: appId,
+        chatId: chatId,
+      })
+      .sort({
+        timestamp: -1,
+      })
+      .lean();
+
+    return activities;
+  }
 }

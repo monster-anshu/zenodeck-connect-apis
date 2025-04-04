@@ -31,6 +31,26 @@ export class WebsiteController {
     };
   }
 
+  @Get(':chatId/message')
+  async listMessage(
+    @GetSession('appId') appId: string,
+    @GetSession('channelId') channelId: string,
+    @GetSession('customerId') customerId: string,
+    @Param('chatId') chatId: string
+  ) {
+    const activities = await this.chatService.listMessage(
+      appId,
+      channelId,
+      chatId,
+      customerId
+    );
+
+    return {
+      isSuccess: true,
+      activities,
+    };
+  }
+
   @Post(':chatId/message')
   async message(
     @GetSession('appId') appId: string,
@@ -39,7 +59,7 @@ export class WebsiteController {
     @Param('chatId') chatId: string,
     @Body() body: SendMessageDto
   ) {
-    const activity = await this.chatService.message(
+    const activity = await this.chatService.createMessage(
       appId,
       channelId,
       chatId,
