@@ -19,7 +19,9 @@ export class WebsiteController {
     @GetSession('customerId') customerId: string
   ) {
     const customer = await this.customerService.getById(appId, customerId);
-    const chats = await this.chatService.list(appId, customerId);
+    const chats = await this.chatService.list(appId, {
+      customerIds: [customerId],
+    });
 
     return {
       isSuccess: true,
