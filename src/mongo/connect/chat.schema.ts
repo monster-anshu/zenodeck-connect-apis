@@ -22,6 +22,16 @@ const AssigneeSchema = new Schema(
   { _id: false }
 );
 
+const LastActivitySchema = new Schema(
+  {
+    activityTimestamp: Date,
+    id: Schema.Types.ObjectId,
+    type: String,
+    message: String,
+  },
+  { _id: false }
+);
+
 const ChatSchema = new Schema(
   {
     appId: {
@@ -38,24 +48,7 @@ const ChatSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
-    lastActivityInfo: {
-      activityTimestamp: Date,
-      id: Schema.Types.ObjectId,
-      type: String,
-      userType: String,
-    },
-    lastCustomerMessageInfo: {
-      activityTimestamp: Date,
-      id: Schema.Types.ObjectId,
-      type: String,
-      userType: String,
-    },
-    lastMessageInfo: {
-      activityTimestamp: Date,
-      id: Schema.Types.ObjectId,
-      type: String,
-      userType: String,
-    },
+    lastMessageInfo: LastActivitySchema,
     // metadata: ChatMetadataSchema,
     totalMsgCount: {
       type: Number,

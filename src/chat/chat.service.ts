@@ -40,7 +40,7 @@ export class ChatService {
     pipelines.push({
       $lookup: {
         from: AgentModelProvider.useValue.collection.name,
-        as: 'agent',
+        as: 'agents',
         localField: 'assignee.userId',
         foreignField: 'userId',
         let: { appId: '$appId' },
@@ -63,45 +63,15 @@ export class ChatService {
       },
     });
 
-    pipelines.push({
-      $lookup: {
-        from: ActivityModelProvider.useValue.collection.name,
-        as: 'acitivties',
-        localField: '_id',
-        foreignField: 'chatId',
-        pipeline: [
-          {
-            $sort: {
-              timestamp: -1,
-            },
-          },
-          {
-            $limit: 1,
-          },
-          {
-            $project: {
-              activityData: 1,
-              messageData: 1,
-              timestamp: 1,
-              type: 1,
-            },
-          },
-        ],
-      },
-    });
-
     const addFields: PipelineStage.AddFields['$addFields'] = {
       'assignee.name': {
-        $first: '$agent.firstName',
+        $first: '$agents.firstName',
       },
       'assignee.profilePic': {
-        $first: '$agent.profilePic',
+        $first: '$agents.profilePic',
       },
       // TODO: remove hard coded value
       'assignee.onlineStatus': 'ONLINE',
-      lastActivity: {
-        $first: '$acitivties',
-      },
     };
 
     if (fetchCustomerInfo) {
@@ -126,7 +96,7 @@ export class ChatService {
     }
 
     pipelines.push({ $addFields: addFields });
-    pipelines.push({ $unset: ['agent', 'acitivties'] });
+    pipelines.push({ $unset: ['agents'] });
 
     const chats = await this.chatModel.aggregate(pipelines);
 
@@ -190,6 +160,15 @@ export class ChatService {
       type: 'MESSAGE',
     });
 
+    const set: Partial<Chat> = {};
+
+    set.lastMessageInfo = {
+      activityTimestamp: activity.timestamp,
+      id: activity._id,
+      type: 'TEXT',
+      message: activity.messageData?.message,
+    };
+
     await this.chatModel.updateOne(
       {
         _id: chat._id,
@@ -198,6 +177,7 @@ export class ChatService {
         $inc: {
           totalMsgCount: 1,
         },
+        $set: set,
       }
     );
 
