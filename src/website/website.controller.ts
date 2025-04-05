@@ -40,7 +40,7 @@ export class WebsiteController {
     @GetSession('customerId') customerId: string,
     @Param('chatId') chatId: string
   ) {
-    const activities = await this.chatService.listMessage(
+    const { chat, activities } = await this.chatService.listMessage(
       appId,
       channelId,
       chatId,
@@ -49,6 +49,7 @@ export class WebsiteController {
 
     return {
       isSuccess: true,
+      chat,
       activities,
     };
   }

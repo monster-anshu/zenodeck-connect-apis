@@ -18,7 +18,7 @@ export class ChatService {
 
   async list(
     appId: string,
-    { customerIds, fetchCustomerInfo, limit }: ListChatFilter
+    { customerIds, fetchCustomerInfo, limit, ids, channelIds }: ListChatFilter
   ) {
     const filter: FilterQuery<Chat> = {
       appId: new Types.ObjectId(appId),
@@ -31,6 +31,18 @@ export class ChatService {
       };
     }
 
+    if (ids?.length) {
+      filter._id = {
+        $in: ids.map((id) => new Types.ObjectId(id)),
+      };
+    }
+
+    if (channelIds?.length) {
+      filter.channelId = {
+        $in: channelIds.map((id) => new Types.ObjectId(id)),
+      };
+    }
+
     const pipelines: PipelineStage[] = [];
 
     pipelines.push({
@@ -40,6 +52,12 @@ export class ChatService {
     pipelines.push({
       $sort: { 'lastMessageInfo.activityTimestamp': -1 },
     });
+
+    if (limit) {
+      pipelines.push({
+        $limit: limit,
+      });
+    }
 
     pipelines.push({
       $lookup: {
@@ -82,27 +100,23 @@ export class ChatService {
       pipelines.push({
         $lookup: {
           from: CustomerModelProvider.useValue.collection.name,
-          as: 'customer',
+          as: 'customers',
           localField: 'customerId',
           foreignField: '_id',
         },
       });
 
       addFields.customer = {
-        $first: '$customer.fields',
+        $first: '$customers.fields',
       };
     }
 
-    if (limit) {
-      pipelines.push({
-        $limit: limit,
-      });
-    }
-
     pipelines.push({ $addFields: addFields });
-    pipelines.push({ $unset: ['agents'] });
+    pipelines.push({ $unset: ['agents', 'customers'] });
 
-    const chats = await this.chatModel.aggregate(pipelines);
+    const chats = await this.chatModel.aggregate<
+      Chat & { _id: Types.ObjectId }
+    >(pipelines);
 
     return chats;
   }
@@ -194,18 +208,14 @@ export class ChatService {
     chatId: string,
     customerId?: string
   ) {
-    const filter: FilterQuery<Chat> = {
-      _id: chatId,
-      appId: appId,
-      channelId: channelId,
-      status: 'ACTIVE',
-    };
-
-    if (customerId) {
-      filter.customerId = customerId;
-    }
-
-    const chat = await this.chatModel.findOne(filter).lean();
+    const chat = (
+      await this.list(appId, {
+        customerIds: customerId ? [customerId] : [],
+        ids: [chatId],
+        channelIds: [channelId],
+        limit: 1,
+      })
+    ).at(0);
 
     if (!chat) {
       throw new NotFoundException('CHAT_NOT_FOUND');
@@ -216,6 +226,6 @@ export class ChatService {
       chat._id.toString()
     );
 
-    return activities;
+    return { chat, activities };
   }
 }
