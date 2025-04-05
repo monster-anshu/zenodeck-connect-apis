@@ -55,14 +55,12 @@ export class WebsiteController {
   @Post(':chatId/message')
   async message(
     @GetSession('appId') appId: string,
-    @GetSession('channelId') channelId: string,
     @GetSession('customerId') customerId: string,
     @Param('chatId') chatId: string,
     @Body() body: SendMessageDto
   ) {
     const activity = await this.chatService.createMessage(
       appId,
-      channelId,
       chatId,
       {
         type: 'CUSTOMER',

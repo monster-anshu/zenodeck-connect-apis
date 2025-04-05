@@ -153,15 +153,14 @@ export class ChatService {
 
   async createMessage(
     appId: string,
-    channelId: string,
     chatId: string,
     from: From,
-    body: SendMessageDto
+    body: SendMessageDto,
+    customerId?: string
   ) {
     const filter: FilterQuery<Chat> = {
       _id: chatId,
       appId: appId,
-      channelId: channelId,
       status: 'ACTIVE',
     };
 
