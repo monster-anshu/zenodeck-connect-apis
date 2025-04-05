@@ -36,13 +36,11 @@ export class WebsiteController {
   @Get(':chatId/message')
   async listMessage(
     @GetSession('appId') appId: string,
-    @GetSession('channelId') channelId: string,
     @GetSession('customerId') customerId: string,
     @Param('chatId') chatId: string
   ) {
     const { chat, activities } = await this.chatService.listMessage(
       appId,
-      channelId,
       chatId,
       customerId
     );

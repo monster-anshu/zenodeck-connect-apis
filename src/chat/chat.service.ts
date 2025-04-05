@@ -112,6 +112,15 @@ export class ChatService {
     }
 
     pipelines.push({ $addFields: addFields });
+
+    if (fetchCustomerInfo) {
+      pipelines.push({
+        $addFields: {
+          'customer.onlineStatus': 'ONLINE',
+        },
+      });
+    }
+
     pipelines.push({ $unset: ['agents', 'customers'] });
 
     const chats = await this.chatModel.aggregate<
@@ -202,17 +211,12 @@ export class ChatService {
     return activity;
   }
 
-  async listMessage(
-    appId: string,
-    channelId: string,
-    chatId: string,
-    customerId?: string
-  ) {
+  async listMessage(appId: string, chatId: string, customerId?: string) {
     const chat = (
       await this.list(appId, {
         customerIds: customerId ? [customerId] : [],
+        fetchCustomerInfo: customerId ? false : true,
         ids: [chatId],
-        channelIds: [channelId],
         limit: 1,
       })
     ).at(0);
