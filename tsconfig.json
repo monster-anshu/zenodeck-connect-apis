@@ -22,5 +22,6 @@
     "paths": {
       "~/*": ["src/*", "services/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "services/**/*.ts"]
 }
