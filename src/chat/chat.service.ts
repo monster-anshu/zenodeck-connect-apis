@@ -216,6 +216,7 @@ export class ChatService {
       this.socketService.getConnectionIds({
         appId: appId,
         ignoreUserId: from.type === 'AGENT' ? from.userId : from.customerId,
+        customerId: chat.customerId.toString(),
       }),
     ]);
 

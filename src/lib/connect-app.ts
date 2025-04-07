@@ -3,7 +3,6 @@ import {
   ConnectAppEncryption,
   ConnectAppModelProvider,
 } from '~/mongo/connect/connect-app';
-import { MONGO_CONNECTION } from '~/mongo/connections';
 import { decrypt } from './crypto';
 
 type GetAppEncryptionKeyOptions =

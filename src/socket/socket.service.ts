@@ -5,7 +5,6 @@ import {
 import { fromUtf8 } from '@aws-sdk/util-utf8-node';
 import { FilterQuery, Types } from 'mongoose';
 import { socketClient } from '~/aws/api-gateway';
-import { Activity } from '~/mongo/connect/activity.schema';
 import {
   SocketConnection,
   SocketConnectionModelProvider,
@@ -94,17 +93,29 @@ export class SocketService {
     appId,
     ignoreUserId,
     userId,
+    customerId,
+    ignoreCustomerId,
   }: GetConnectionIdOptions) {
-    const filter: FilterQuery<SocketConnection> = {
-      appId: appId,
+    const agentFilter: FilterQuery<SocketConnection> = {
+      userType: 'AGENT',
       userId: {
         $ne: new Types.ObjectId(ignoreUserId),
       },
     };
 
     if (userId) {
-      filter.userId = new Types.ObjectId(userId);
+      agentFilter.userId = new Types.ObjectId(userId);
     }
+
+    const customerFilter: FilterQuery<SocketConnection> = {
+      userType: 'CUSTOMER',
+      userId: customerId,
+    };
+
+    const filter = {
+      appId: appId,
+      $or: [agentFilter, customerFilter],
+    };
 
     const connections = await this.socketModel.find(filter).lean();
 
@@ -119,5 +130,7 @@ export class SocketService {
 type GetConnectionIdOptions = {
   appId: string;
   userId?: string;
+  customerId: string;
   ignoreUserId: string;
+  ignoreCustomerId?: string;
 };

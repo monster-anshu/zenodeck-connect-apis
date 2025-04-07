@@ -47,6 +47,7 @@ const serverlessConfiguration: AWS = {
       MONGO_COMMON_URI: '${env:MONGO_COMMON_URI}',
       MONGO_DEFAULT_URI: '${env:MONGO_DEFAULT_URI}',
       NODE_ENV: 'production',
+      SESSION_JWT_SECRET: '${env:SESSION_JWT_SECRET}',
       STAGE: '${opt:stage}',
       TZ: 'Asia/Kolkata',
     },
