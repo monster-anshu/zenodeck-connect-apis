@@ -5,6 +5,7 @@ import { ActivityModelProvider, From } from '~/mongo/connect/activity.schema';
 import { AgentModelProvider } from '~/mongo/connect/agent.schema';
 import { Chat, ChatModelProvider } from '~/mongo/connect/chat.schema';
 import { CustomerModelProvider } from '~/mongo/connect/customer.schema';
+import { SocketService } from '~/socket/socket.service';
 import { SendMessageDto } from './dto/chat-send-message.dto';
 import { ListChatFilter } from './type';
 
@@ -13,7 +14,8 @@ export class ChatService {
   constructor(
     @Inject(ChatModelProvider.provide)
     private readonly chatModel: typeof ChatModelProvider.useValue,
-    private readonly activityService: ActivityService
+    private readonly activityService: ActivityService,
+    private readonly socketService: SocketService
   ) {}
 
   async list(
@@ -155,8 +157,7 @@ export class ChatService {
     appId: string,
     chatId: string,
     from: From,
-    body: SendMessageDto,
-    customerId?: string
+    body: SendMessageDto
   ) {
     const filter: FilterQuery<Chat> = {
       _id: chatId,
@@ -207,7 +208,26 @@ export class ChatService {
       }
     );
 
-    return activity;
+    const [activities, connectionIds] = await Promise.all([
+      this.activityService.list(appId, chat._id.toString(), {
+        limit: 1,
+        activityId: activity._id.toString(),
+      }),
+      this.socketService.getConnectionIds({
+        appId: appId,
+        ignoreUserId: from.type === 'AGENT' ? from.userId : from.customerId,
+      }),
+    ]);
+
+    const formatted = activities.at(0);
+    if (!formatted) return null;
+
+    await this.socketService.send(appId, connectionIds, {
+      type: 'ACTIVITY',
+      activity: formatted,
+    });
+
+    return formatted;
   }
 
   async listMessage(appId: string, chatId: string, customerId?: string) {

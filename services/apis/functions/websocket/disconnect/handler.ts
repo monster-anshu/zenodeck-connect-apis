@@ -1,6 +1,5 @@
 import { APIGatewayEvent, Handler } from 'aws-lambda';
-import { SocketConnectionModelProvider } from '~/mongo/connect/socket-connection.schema';
-import { removeInactiveConnection } from '~/socket';
+import { socketService } from '~/socket/sls';
 import { SocketAuthorizerContext } from '../authorizer/authorizer';
 
 export const handler: Handler<APIGatewayEvent> = async (event) => {
@@ -15,8 +14,7 @@ export const handler: Handler<APIGatewayEvent> = async (event) => {
 
   const useIdToUse = type == 'CUSTOMER' ? customerId : userId;
 
-  await removeInactiveConnection({
-    appId,
+  await socketService.removeConnection(appId, {
     connectionId,
     fromSocketDisconnectEvent: true,
     userId: useIdToUse!,

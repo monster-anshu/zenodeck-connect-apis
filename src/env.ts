@@ -6,6 +6,10 @@ export const NODE_ENV = process.env.NODE_ENV;
 
 export const CONNECT_APP_API_KEY = process.env.CONNECT_APP_API_KEY as string;
 export const CONNECT_API_URL = process.env.CONNECT_API_URL as string;
+export const CONNECT_APP_SOCKET_URL = process.env
+  .CONNECT_APP_SOCKET_URL as string;
+export const CONNECT_APP_SOCKET_API = process.env
+  .CONNECT_APP_SOCKET_API as string;
 
 export const MONGO_DEFAULT_URI = process.env.MONGO_DEFAULT_URI as string;
 export const MONGO_COMMON_URI = process.env.MONGO_COMMON_URI as string;

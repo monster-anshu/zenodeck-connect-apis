@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PipelineStage, Types } from 'mongoose';
+import { FilterQuery, PipelineStage, Types } from 'mongoose';
 import {
   Activity,
   ActivityModelProvider,
@@ -30,14 +30,30 @@ export class ActivityService {
     return activity.toObject();
   }
 
-  async list(appId: string, chatId: string) {
+  async list(
+    appId: string,
+    chatId: string,
+    {
+      activityId,
+      limit,
+    }: {
+      limit?: number;
+      activityId?: string;
+    } = {}
+  ) {
     const pipelines: PipelineStage[] = [];
 
+    const filter: FilterQuery<Activity> = {
+      appId: new Types.ObjectId(appId),
+      chatId: new Types.ObjectId(chatId),
+    };
+
+    if (activityId) {
+      filter._id = new Types.ObjectId(activityId);
+    }
+
     pipelines.push({
-      $match: {
-        appId: new Types.ObjectId(appId),
-        chatId: new Types.ObjectId(chatId),
-      },
+      $match: filter,
     });
 
     pipelines.push({
@@ -45,6 +61,12 @@ export class ActivityService {
         timestamp: -1,
       },
     });
+
+    if (limit) {
+      pipelines.push({
+        $limit: limit,
+      });
+    }
 
     pipelines.push({
       $lookup: {
