@@ -5,6 +5,7 @@ import type {
   PolicyDocument,
 } from 'aws-lambda';
 import verifyJwt from '~/lib/jwt/verify';
+import { SocketAuthorizerContext } from '../authorizer';
 
 const generatePolicy = (
   principalId: string,
@@ -68,7 +69,7 @@ export const handler: Handler<APIGatewayAuthorizerEvent> = async (
       userId: session.type == 'AGENT' ? session.userId : '',
       customerId: session.type == 'CUSTOMER' ? session.customerId : '',
       type: session.type,
-    };
+    } as SocketAuthorizerContext;
     callback(null, policy);
     return;
   }
