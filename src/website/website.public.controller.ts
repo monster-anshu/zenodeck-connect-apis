@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { ChannelService } from '~/channel/channel.service';
+import { CONNECT_APP_SOCKET_URL } from '~/env';
 import { GetSession } from '~/session/session.decorator';
 import { InitiateWebsiteChatDto } from './dto/website-chat-initiate.dto';
 import { WebsiteService } from './website.service';
@@ -44,6 +45,7 @@ export class WebsitePublicController {
     return {
       isSuccess: true,
       authToken: token,
+      socketUrl: CONNECT_APP_SOCKET_URL,
       chat: chat,
       customer: {
         _id: customer._id,
