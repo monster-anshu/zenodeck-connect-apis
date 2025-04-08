@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 import { ChatService } from '~/chat/chat.service';
 import { SendMessageDto } from '~/chat/dto/chat-send-message.dto';
 import { CustomerGuard } from '~/customer/customer.guard';
 import { CustomerService } from '~/customer/customer.service';
+import { CONNECT_APP_SOCKET_URL } from '~/env';
 import { GetSession } from '~/session/session.decorator';
 
 @UseGuards(CustomerGuard)
@@ -16,7 +26,8 @@ export class WebsiteController {
   @Get('list')
   async list(
     @GetSession('appId') appId: string,
-    @GetSession('customerId') customerId: string
+    @GetSession('customerId') customerId: string,
+    @Req() req: FastifyRequest
   ) {
     const customer = await this.customerService.getById(appId, customerId);
     const chats = await this.chatService.list(appId, {
@@ -29,6 +40,8 @@ export class WebsiteController {
         ...customer.fields,
         _id: customer._id,
       },
+      socketUrl: CONNECT_APP_SOCKET_URL,
+      authToken: req.headers.authorization,
       chats,
     };
   }
