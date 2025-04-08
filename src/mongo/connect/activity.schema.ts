@@ -16,6 +16,7 @@ const ACTIVITY_DATA_TYPE = [
 export const MESSAGE_DATA_TYPE = ['TEXT'] as const;
 
 const USRE_TYPE = ['CUSTOMER', 'AGENT'] as const;
+const ACTIVITY_STATUS = ['PENDING', 'SENT', 'DELIVERED', 'FAILED'] as const;
 
 export const AttachmentSchema = new Schema(
   {
@@ -115,12 +116,17 @@ export const ActivitySchema = new Schema(
       type: String,
     },
     from: {
-      type: FormSchema,
       required: true,
+      type: FormSchema,
     },
     messageData: MessageDataSchema,
     replyContext: {
       messageId: Schema.Types.ObjectId,
+    },
+    status: {
+      enum: ACTIVITY_STATUS,
+      required: true,
+      type: String,
     },
     timestamp: {
       required: true,

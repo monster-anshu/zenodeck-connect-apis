@@ -25,6 +25,7 @@ export class ActivityService {
     const activity = await this.activityModel.create({
       ...data,
       appId: appId,
+      status: 'DELIVERED',
     });
 
     return activity.toObject();
