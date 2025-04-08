@@ -27,24 +27,30 @@ export class SocketService {
       fromSocketDisconnectEvent?: boolean;
     }
   ) {
-    await this.socketModel.updateOne(
-      {
+    const connection = await this.socketModel
+      .findOneAndUpdate(
+        {
+          appId,
+          'connections.connectionId': connectionId,
+          userId: userId,
+          userType: userType,
+        },
+        {
+          $pull: { connections: { connectionId } },
+        },
+        {
+          new: true,
+        }
+      )
+      .lean();
+
+    if (connection && connection.connections.length === 0)
+      await this.socketModel.deleteOne({
         appId,
-        'connections.connectionId': connectionId,
         userId: userId,
         userType: userType,
-      },
-      {
-        $pull: { connections: { connectionId } },
-      }
-    );
-
-    const data = await this.socketModel.deleteOne({
-      appId,
-      userId: userId,
-      userType: userType,
-      connections: { $size: 0 },
-    });
+        connections: { $size: 0 },
+      });
 
     if (fromSocketDisconnectEvent) {
     }
@@ -60,19 +66,21 @@ export class SocketService {
           ConnectionId,
           Data: fromUtf8(JSON.stringify(message)),
         });
-        const connection = await this.socketModel
-          .findOne({
-            appId,
-            'connections.connectionId': ConnectionId,
-          })
-          .lean();
 
-        if (!flag && connection) {
-          await this.removeConnection(appId, {
-            connectionId: ConnectionId,
-            userId: connection.userId.toString(),
-            userType: connection.userType,
-          });
+        if (!flag) {
+          const connection = await this.socketModel
+            .findOne({
+              appId,
+              'connections.connectionId': ConnectionId,
+            })
+            .lean();
+
+          if (connection)
+            await this.removeConnection(appId, {
+              connectionId: ConnectionId,
+              userId: connection.userId.toString(),
+              userType: connection.userType,
+            });
         }
       })
     );
@@ -94,13 +102,9 @@ export class SocketService {
     ignoreUserId,
     userId,
     customerId,
-    ignoreCustomerId,
   }: GetConnectionIdOptions) {
     const agentFilter: FilterQuery<SocketConnection> = {
       userType: 'AGENT',
-      userId: {
-        $ne: new Types.ObjectId(ignoreUserId),
-      },
     };
 
     if (userId) {
@@ -114,6 +118,9 @@ export class SocketService {
 
     const filter = {
       appId: appId,
+      userId: {
+        $ne: new Types.ObjectId(ignoreUserId),
+      },
       $or: [agentFilter, customerFilter],
     };
 
@@ -132,5 +139,4 @@ type GetConnectionIdOptions = {
   userId?: string;
   customerId: string;
   ignoreUserId: string;
-  ignoreCustomerId?: string;
 };
