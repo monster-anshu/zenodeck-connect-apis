@@ -3,6 +3,8 @@ import { ProjectionType } from 'mongoose';
 import { decrypt, encrypt } from '~/lib/crypto';
 import { randomString } from '~/lib/random';
 import { Channel, ChannelModelProvider } from '~/mongo/connect/channel.schema';
+import { defaultConfig } from './default';
+import { CreateChannelDto } from './dto/channel-create.dto';
 
 @Injectable()
 export class ChannelService {
@@ -127,5 +129,32 @@ export class ChannelService {
     }
 
     return channel;
+  }
+
+  async create(
+    appId: string,
+    userId: string,
+    { primaryColor, name, description }: CreateChannelDto
+  ) {
+    const channel = await this.channelModel.create({
+      appId: appId,
+      clientId: encrypt(randomString(32)),
+      createdBy: userId,
+      customization: {
+        primaryColor: primaryColor,
+      },
+      description: description,
+      isConnected: true,
+      isDefault: true,
+      name: name,
+      privateKeys: {
+        clientSecret: encrypt(randomString(32)),
+      },
+      type: 'WEB',
+      welcomeMessage:
+        'Welcome! We appreciate your presence on our site. Should you have any questions or require assistance, please feel free to reach out to us. We aim to assist you promptly.',
+    });
+
+    return channel.toObject();
   }
 }
