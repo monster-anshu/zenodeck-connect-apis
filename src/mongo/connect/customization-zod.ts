@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const hexColor = z.string().regex(/^#(?:[0-9a-fA-F]{6})$/, {
+export const hexColor = z.string().regex(/^#(?:[0-9A-F]{6})$/, {
   message: 'Invalid hex color',
 });
 

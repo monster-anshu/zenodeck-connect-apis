@@ -145,7 +145,7 @@ export class ChannelService {
       },
       description: description,
       isConnected: true,
-      isDefault: true,
+      isDefault: false,
       name: name,
       privateKeys: {
         clientSecret: encrypt(randomString(32)),
