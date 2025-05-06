@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { ConnectAppService } from '~/connect-app/connect-app.service';
-import { USER_SERVICE_DOMAIN } from '~/env';
+import { USER_SERVICE_URL } from '~/env';
 import CompanyUserPermissionModel from '~/mongo/common/schema/CompanyUserPermission';
 import { AgentService } from './agent.service';
 
@@ -15,7 +15,7 @@ export class AgentGuard implements CanActivate {
   constructor(
     private readonly connectAppService: ConnectAppService,
     private readonly agentService: AgentService
-  ) {}
+  ) { }
   async canActivate(context: ExecutionContext) {
     const response = context.switchToHttp().getResponse();
     const request = context.switchToHttp().getRequest<FastifyRequest>();
@@ -47,15 +47,11 @@ export class AgentGuard implements CanActivate {
           companyId,
         };
       } else if (!userCompanies?.length) {
-        response.header(
-          'x-zenodeck-redirect',
-          `${USER_SERVICE_DOMAIN}/fill-details?productId=CONNECT`
-        );
+        const url = new URL("/fill-details?productId=CONNECT", USER_SERVICE_URL)
+        response.header('x-zenodeck-redirect', url);
       } else {
-        response.header(
-          'x-zenodeck-redirect',
-          `${USER_SERVICE_DOMAIN}/company-list?productId=CONNECT`
-        );
+        const url = new URL("/company-list?productId=CONNECT", USER_SERVICE_URL)
+        response.header('x-zenodeck-redirect', url);
       }
     }
     if (!userId || !companyId) {

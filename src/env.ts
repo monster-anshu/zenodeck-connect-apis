@@ -19,7 +19,7 @@ export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY as string;
 
 export const SESSION_JWT_SECRET = process.env.SESSION_JWT_SECRET as string;
 export const ROOT_DOMAIN = process.env.ROOT_DOMAIN as string;
-export const USER_SERVICE_DOMAIN = 'accounts.' + ROOT_DOMAIN;
+export const USER_SERVICE_URL = process.env.USER_SERVICE_URL;
 
 export const AWS_REGION = 'us-east-1';
 export const IS_OFFLINE = process.env.IS_OFFLINE === 'true';
